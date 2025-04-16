@@ -106,8 +106,8 @@ const OurProcess = () => {
       });
       setActiveSteps(newActiveSteps);
 
-      currentProgress += 4;
-    }, 15);
+      currentProgress += 7;
+    }, 30);
 
     return () => clearInterval(interval);
   }, []);
