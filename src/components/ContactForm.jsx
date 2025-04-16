@@ -123,7 +123,7 @@ ${formData.message}`;
 
       // For mobile devices, open WhatsApp app directly
       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        window.location.href = `whatsapp://send?phone=919823149491&text=${encodedMessage}`;
+        window.location.href = `whatsapp://send?phone=919589823766&text=${encodedMessage}`;
       } else {
         // For desktop, open WhatsApp Web
         window.open(`https://web.whatsapp.com/send?phone=919823149491&text=${encodedMessage}`, '_blank');
