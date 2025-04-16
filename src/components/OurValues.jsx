@@ -1,0 +1,97 @@
+import React from "react";
+import { motion } from "framer-motion";
+import { RiShieldLine, RiSpeedLine, RiHeartLine, RiUserSmileLine } from "react-icons/ri";
+
+const values = [
+  {
+    icon: <RiSpeedLine className="text-4xl" />,
+    title: "Efficiency",
+    description: "Our solutions are designed to maximize productivity, minimizing waste and delivering results quickly and effectively."
+  },
+  {
+    icon: <RiShieldLine className="text-4xl" />,
+    title: "Transparency",
+    description: "We believe in open communication and clear processes, ensuring trust and accountability in everything we do."
+  },
+  {
+    icon: <RiUserSmileLine className="text-4xl" />,
+    title: "Respect",
+    description: "We value our clients and partners, fostering relationships built on mutual respect and appreciation."
+  },
+  {
+    icon: <RiHeartLine className="text-4xl" />,
+    title: "Passion",
+    description: "Driven by a deep commitment to excellence, we put our heart into every project to ensure success."
+  }
+];
+
+const OurValues = () => {
+  return (
+    <section className="relative py-20 px-6">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/background.avif"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/40" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+            The Values that Drive Everything We Do
+          </h2>
+          <p className="text-gray-200 max-w-2xl mx-auto">
+            We love what we do and have a lot of fun at work, but we're also deeply committed to delivering exceptional results.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {values.map((value, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: index * 0.1,
+                hover: { duration: 0.2, ease: "easeInOut" }
+              }}
+              viewport={{ once: true }}
+              className="group p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+            >
+              <div className="mb-6">
+                <div className="w-12 h-12 rounded-xl bg-white/10 group-hover:bg-gradient-to-r from-[#2A72F8]/20 to-[#8F44EC]/20 flex items-center justify-center transition-colors duration-300">
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    className="text-white group-hover:text-[#2A72F8]"
+                  >
+                    {value.icon}
+                  </motion.div>
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-white">
+                {value.title}
+              </h3>
+              <p className="text-gray-200 text-sm leading-relaxed">
+                {value.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default OurValues;
