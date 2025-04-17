@@ -96,7 +96,7 @@ const HeroSection = () => {
     const interval = setInterval(() => {
       setDirection(1);
       setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 4000); // Increased to 5 seconds for better viewing
+    }, 3000); // Increased to 5 seconds for better viewing
     return () => clearInterval(interval);
   }, []);
 
@@ -112,30 +112,26 @@ const HeroSection = () => {
 
   const slideVariants = {
     enter: (direction) => ({
-      scale: 1.2,
-      y: 0,
+      x: direction > 0 ? 1000 : -1000,
       opacity: 0,
       zIndex: 0,
     }),
     center: {
       x: 0,
-      y: 0,
-      scale: 1,
       opacity: 1,
       zIndex: 1,
       transition: {
-        scale: { duration: 0.4 },
-        opacity: { duration: 0.3 },
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.2 },
       }
     },
     exit: (direction) => ({
-      scale: 0.9,
-      y: direction > 0 ? -100 : 100,
+      x: direction > 0 ? -1000 : 1000,
       opacity: 0,
       zIndex: 0,
       transition: {
-        y: { duration: 0.4 },
-        opacity: { duration: 0.3 }
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.2 }
       }
     })
   };
@@ -195,13 +191,30 @@ const HeroSection = () => {
         style={{ scale, opacity }}
         className="flex-1 lg:flex-[1.2] w-full"
       >
-        <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl relative bg-black/90">
+        <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl relative bg-white">
           {isLoading ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#2A72F8] animate-bounce" style={{ animationDelay: '0s' }}></div>
+                <div className="w-3 h-3 rounded-full bg-[#5A5EF5] animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-3 h-3 rounded-full bg-[#8F44EC] animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+              </div>
+              <p className="mt-4 text-gray-600 font-medium text-sm">Loading gallery...</p>
             </div>
           ) : (
             <>
+              {/* Previous Image for smooth transition */}
+              <div className="absolute inset-0 z-0">
+                {!imageErrors.has((currentImage - 1 + images.length) % images.length) && (
+                  <img
+                    src={images[(currentImage - 1 + images.length) % images.length].src}
+                    alt="Previous"
+                    className="w-full h-full object-cover"
+                    style={{ opacity: 0.5 }}
+                  />
+                )}
+              </div>
+
               {/* Main Image */}
               <AnimatePresence initial={false} custom={direction} mode="popLayout">
                 <motion.div
@@ -226,7 +239,7 @@ const HeroSection = () => {
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800">
                       <div className="text-center">
                         <p className="text-2xl font-semibold mb-2">Image not available</p>
                         <p className="text-sm opacity-75">{images[currentImage].title}</p>

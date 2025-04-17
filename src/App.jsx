@@ -5,10 +5,12 @@ import LandingPage from './Pages/LandingPage'
 import HomePage from './Pages/HomePage'
 import Services from './components/Services'
 import ContactUs from './Pages/ContactUs'
-import ProjectGallery from './components/ProjectGallery'  
+import ProjectGallery from './components/ProjectGallery' 
+import ScrollToTop from './components/ScrollToTop'
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop />
       <Routes>
         <Route path='/' element={<LandingPage/>}/>
         <Route path='/home' element={<HomePage/>}/>

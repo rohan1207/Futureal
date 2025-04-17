@@ -12,15 +12,22 @@ const steps = [
     description:
       "Understanding the client's requirements and project parameters, to proceed with strategising the project",
     icon: HiOutlineCog,
-    top: "-15px",
-    iconLeft: "calc(78% - 40px)",
-    contentPosition: {
-      top: "26px",
-      left: "calc(36% + 60px)",
-      textAlign: "right",
-      width: "372px",
+    desktopPosition: {
+      left: "5%",
+      iconTop: "0",
+      contentTop: "80px",
     },
-    pathTrigger: 150 // Position where this step should reveal
+    mobilePosition: {
+      top: "-15px",
+      iconLeft: "calc(78% - 40px)",
+      contentPosition: {
+        top: "26px",
+        left: "calc(36% + 60px)",
+        textAlign: "right",
+        width: "372px",
+      },
+    },
+    pathTrigger: 150
   },
   {
     title: "Strategy Development",
@@ -28,15 +35,22 @@ const steps = [
       "We develop a holistic strategy leveraging our extensive experience and market research.",
     sub: "Feasibility >> Market Research >> Project Strategy",
     icon: HiOutlineChartBar,
-    top: "110px",
-    iconLeft: "calc(28% - 40px)",
-    contentPosition: {
-      top: "155px",
-      right: "calc(33% + 60px)",
-      textAlign: "left",
-      width: "343px",
+    desktopPosition: {
+      left: "35%",
+      iconTop: "0",
+      contentTop: "-120px",
     },
-    pathTrigger: 400 // Position where this step should reveal
+    mobilePosition: {
+      top: "110px",
+      iconLeft: "calc(28% - 40px)",
+      contentPosition: {
+        top: "155px",
+        right: "calc(33% + 60px)",
+        textAlign: "left",
+        width: "343px",
+      },
+    },
+    pathTrigger: 400
   },
   {
     title: "Implementation",
@@ -44,30 +58,44 @@ const steps = [
       "Implementing all the plans with the assured period and cost. Adhering to all the safety guidelines set by the client.",
     sub: "Construction Management >> Quality Control >> Time Management",
     icon: HiOutlineCube,
-    top: "222px",
-    iconLeft: "calc(78% - 40px)",
-    contentPosition: {
-      top: "272px",
-      right: "calc(-3% + 60px)",
-      textAlign: "left",
-      width: "403px",
+    desktopPosition: {
+      left: "65%",
+      iconTop: "0",
+      contentTop: "80px",
     },
-    pathTrigger: 650 // Position where this step should reveal
+    mobilePosition: {
+      top: "222px",
+      iconLeft: "calc(78% - 40px)",
+      contentPosition: {
+        top: "272px",
+        right: "calc(-3% + 60px)",
+        textAlign: "left",
+        width: "403px",
+      },
+    },
+    pathTrigger: 650
   },
   {
     title: "Delivery & Beyond",
     description:
       "Transforming our client's vision into reality by maintaining a perfect balance of cost, time, and quality. We collaborate seamlessly with all stakeholders to ensure every project achieves its full potential and delivers exceptional success.",
     icon: HiOutlineClipboardCheck,
-    top: "352px",
-    iconLeft: "calc(28% - 40px)",
-    contentPosition: {
-      top: "401px",
-      left: "calc(27% + 60px)",
-      textAlign: "left",
-      width: "447px",
+    desktopPosition: {
+      left: "95%",
+      iconTop: "0",
+      contentTop: "-120px",
     },
-    pathTrigger: 900 // Position where this step should reveal
+    mobilePosition: {
+      top: "352px",
+      iconLeft: "calc(28% - 40px)",
+      contentPosition: {
+        top: "401px",
+        left: "calc(27% + 60px)",
+        textAlign: "left",
+        width: "447px",
+      },
+    },
+    pathTrigger: 900
   },
 ];
 
@@ -76,6 +104,15 @@ const OurProcess = () => {
   const [progress, setProgress] = useState(0);
   const pathRef = useRef(null);
   const dotRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const path = pathRef.current;
@@ -94,10 +131,8 @@ const OurProcess = () => {
         dotRef.current.setAttribute("cy", point.y);
       }
 
-      // Update progress for the blue line
       setProgress(currentProgress);
 
-      // Check which steps should be revealed based on current progress
       const newActiveSteps = new Set(activeSteps);
       steps.forEach((step, index) => {
         if (currentProgress >= step.pathTrigger) {
@@ -106,24 +141,27 @@ const OurProcess = () => {
       });
       setActiveSteps(newActiveSteps);
 
-      currentProgress += 7;
-    }, 30);
+      currentProgress += 20;
+    }, 15);
 
     return () => clearInterval(interval);
   }, []);
 
+  const desktopPath = "M40 50 H560";
+  const mobilePath = "M600 50H100C50 50 50 175 100 175H600C650 175 650 300 600 300H100C50 300 50 425 100 425H600C650 425 650 550 600 550H100C50 550 50 675 100 675H600";
+
   return (
-    <div className="relative bg-[#EFF0F5] px-6 py-20 text-[#4B4F65] font-[Inter] min-h-[800px] overflow-hidden">
+    <div className="relative bg-[#EFF0F5] px-6 py-20 text-[#4B4F65] font-[Inter] min-h-[800px] md:min-h-[400px] overflow-hidden">
       {/* SVG Path with Glowing Dot */}
       <svg
-        viewBox="0 0 800 700"
+        viewBox={isMobile ? "0 0 800 700" : "0 0 600 100"}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-full z-0"
       >
         {/* Gray background path */}
         <path
-          d="M600 50H100C50 50 50 175 100 175H600C650 175 650 300 600 300H100C50 300 50 425 100 425H600C650 425 650 550 600 550H100C50 550 50 675 100 675H600"
+          d={isMobile ? mobilePath : desktopPath}
           stroke="#E2E8F0"
           strokeWidth="4"
           fill="none"
@@ -131,7 +169,7 @@ const OurProcess = () => {
         {/* Animated blue path */}
         <path
           ref={pathRef}
-          d="M600 50H100C50 50 50 175 100 175H600C650 175 650 300 600 300H100C50 300 50 425 100 425H600C650 425 650 550 600 550H100C50 550 50 675 100 675H600"
+          d={isMobile ? mobilePath : desktopPath}
           stroke="#007BFF"
           strokeWidth="4"
           fill="none"
@@ -146,12 +184,15 @@ const OurProcess = () => {
           fill="#007BFF"
           filter="url(#glow)"
         />
-        {/* Glow filter */}
+        {/* Enhanced glow filter */}
         <defs>
-          <filter id="glow">
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feFlood floodColor="#007BFF" floodOpacity="0.3" result="glowColor"/>
+            <feComposite in="glowColor" in2="coloredBlur" operator="in" result="softGlow"/>
             <feMerge>
-              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="softGlow"/>
+              <feMergeNode in="softGlow"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
@@ -162,14 +203,18 @@ const OurProcess = () => {
       <div className="relative z-10 max-w-6xl mx-auto">
         {steps.map((step, index) => (
           <div key={index}>
-            {/* Icon on Curve */}
+            {/* Icon on Line */}
             <div
-              className={`absolute z-10 w-20 h-20 bg-white rounded-full shadow-md flex items-center justify-center text-[#4B4F65] transition-all duration-500 ${
+              className={`absolute z-10 w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center text-[#4B4F65] transition-all duration-500 ${
                 activeSteps.has(index) ? 'scale-100 opacity-100' : 'scale-90 opacity-50'
               }`}
-              style={{
-                top: step.top,
-                left: step.iconLeft,
+              style={isMobile ? {
+                top: step.mobilePosition.top,
+                left: step.mobilePosition.iconLeft,
+              } : {
+                top: step.desktopPosition.iconTop,
+                left: step.desktopPosition.left,
+                transform: 'translateX(-50%)',
               }}
             >
               {React.createElement(step.icon, { 
@@ -186,20 +231,17 @@ const OurProcess = () => {
                   ? 'opacity-100 transform translate-y-0' 
                   : 'opacity-0 transform -translate-y-4'
               }`}
-              style={{
-                top: step.contentPosition.top,
-                ...(step.contentPosition.left
-                  ? { left: step.contentPosition.left }
-                  : { right: step.contentPosition.right }),
-                textAlign: step.contentPosition.textAlign,
-                width: step.contentPosition.width,
+              style={isMobile ? {
+                ...step.mobilePosition.contentPosition,
+              } : {
+                top: step.desktopPosition.contentTop,
+                left: step.desktopPosition.left,
+                transform: 'translateX(-50%)',
+                width: '300px',
+                textAlign: 'center',
               }}
             >
-              <div
-                className={`${
-                  step.contentPosition.textAlign === "right" ? "pl-6" : "pr-6"
-                }`}
-              >
+              <div className="px-4">
                 <h3 className="text-lg font-semibold text-[#2B2B3A] mb-2">
                   {step.title}
                 </h3>
