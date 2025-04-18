@@ -12,22 +12,8 @@ const steps = [
     description:
       "Understanding the client's requirements and project parameters, to proceed with strategising the project",
     icon: HiOutlineCog,
-    desktopPosition: {
-      left: "5%",
-      iconTop: "0",
-      contentTop: "80px",
-    },
-    mobilePosition: {
-      top: "-15px",
-      iconLeft: "calc(78% - 40px)",
-      contentPosition: {
-        top: "26px",
-        left: "calc(36% + 60px)",
-        textAlign: "right",
-        width: "372px",
-      },
-    },
-    pathTrigger: 150
+    iconBg: "#E6F7FF",
+    iconColor: "#0089FF",
   },
   {
     title: "Strategy Development",
@@ -35,22 +21,8 @@ const steps = [
       "We develop a holistic strategy leveraging our extensive experience and market research.",
     sub: "Feasibility >> Market Research >> Project Strategy",
     icon: HiOutlineChartBar,
-    desktopPosition: {
-      left: "35%",
-      iconTop: "0",
-      contentTop: "-120px",
-    },
-    mobilePosition: {
-      top: "110px",
-      iconLeft: "calc(28% - 40px)",
-      contentPosition: {
-        top: "155px",
-        right: "calc(33% + 60px)",
-        textAlign: "left",
-        width: "343px",
-      },
-    },
-    pathTrigger: 400
+    iconBg: "#E6F7FF",
+    iconColor: "#0089FF",
   },
   {
     title: "Implementation",
@@ -58,202 +30,253 @@ const steps = [
       "Implementing all the plans with the assured period and cost. Adhering to all the safety guidelines set by the client.",
     sub: "Construction Management >> Quality Control >> Time Management",
     icon: HiOutlineCube,
-    desktopPosition: {
-      left: "65%",
-      iconTop: "0",
-      contentTop: "80px",
-    },
-    mobilePosition: {
-      top: "222px",
-      iconLeft: "calc(78% - 40px)",
-      contentPosition: {
-        top: "272px",
-        right: "calc(-3% + 60px)",
-        textAlign: "left",
-        width: "403px",
-      },
-    },
-    pathTrigger: 650
+    iconBg: "#E6F7FF",
+    iconColor: "#0089FF",
   },
   {
     title: "Delivery & Beyond",
     description:
       "Transforming our client's vision into reality by maintaining a perfect balance of cost, time, and quality. We collaborate seamlessly with all stakeholders to ensure every project achieves its full potential and delivers exceptional success.",
     icon: HiOutlineClipboardCheck,
-    desktopPosition: {
-      left: "95%",
-      iconTop: "0",
-      contentTop: "-120px",
-    },
-    mobilePosition: {
-      top: "352px",
-      iconLeft: "calc(28% - 40px)",
-      contentPosition: {
-        top: "401px",
-        left: "calc(27% + 60px)",
-        textAlign: "left",
-        width: "447px",
-      },
-    },
-    pathTrigger: 900
+    iconBg: "#E6F7FF",
+    iconColor: "#0089FF",
   },
 ];
 
 const OurProcess = () => {
-  const [activeSteps, setActiveSteps] = useState(new Set());
-  const [progress, setProgress] = useState(0);
-  const pathRef = useRef(null);
-  const dotRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [activeStep, setActiveStep] = useState(0);
+  const [isHovering, setIsHovering] = useState(null);
+  const processRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const stepRefs = useRef([]);
 
+  // Initialize refs array
+  useEffect(() => {
+    stepRefs.current = Array(steps.length)
+      .fill()
+      .map((_, i) => stepRefs.current[i] || React.createRef());
+  }, []);
+
+  // Handle resize events
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 640);
+      setIsTablet(window.innerWidth >= 640 && window.innerWidth < 1024);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Intersection observer for triggering animation when component is visible
   useEffect(() => {
-    const path = pathRef.current;
-    const totalLength = path.getTotalLength();
-    let currentProgress = 0;
-
-    const interval = setInterval(() => {
-      if (currentProgress > totalLength) {
-        clearInterval(interval);
-        return;
-      }
-
-      const point = path.getPointAtLength(currentProgress);
-      if (dotRef.current) {
-        dotRef.current.setAttribute("cx", point.x);
-        dotRef.current.setAttribute("cy", point.y);
-      }
-
-      setProgress(currentProgress);
-
-      const newActiveSteps = new Set(activeSteps);
-      steps.forEach((step, index) => {
-        if (currentProgress >= step.pathTrigger) {
-          newActiveSteps.add(index);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
         }
-      });
-      setActiveSteps(newActiveSteps);
-
-      currentProgress += 20;
-    }, 15);
-
-    return () => clearInterval(interval);
+      },
+      { threshold: 0.2 }
+    );
+    
+    if (processRef.current) {
+      observer.observe(processRef.current);
+    }
+    
+    return () => observer.disconnect();
   }, []);
 
-  const desktopPath = "M40 50 H560";
-  const mobilePath = "M600 50H100C50 50 50 175 100 175H600C650 175 650 300 600 300H100C50 300 50 425 100 425H600C650 425 650 550 600 550H100C50 550 50 675 100 675H600";
+  // Auto-advance steps with a delay
+  useEffect(() => {
+    if (!isVisible) return;
+    
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
+    }, 1500);
+    
+    return () => clearInterval(interval);
+  }, [isVisible]);
+
+  // Handle manual step selection
+  const handleStepClick = (index) => {
+    setActiveStep(index);
+  };
 
   return (
-    <div className="relative bg-[#EFF0F5] px-6 py-20 text-[#4B4F65] font-[Inter] min-h-[800px] md:min-h-[400px] overflow-hidden">
-      {/* SVG Path with Glowing Dot */}
-      <svg
-        viewBox={isMobile ? "0 0 800 700" : "0 0 600 100"}
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-full z-0"
-      >
-        {/* Gray background path */}
-        <path
-          d={isMobile ? mobilePath : desktopPath}
-          stroke="#E2E8F0"
-          strokeWidth="4"
-          fill="none"
-        />
-        {/* Animated blue path */}
-        <path
-          ref={pathRef}
-          d={isMobile ? mobilePath : desktopPath}
-          stroke="#007BFF"
-          strokeWidth="4"
-          fill="none"
-          strokeDasharray={pathRef.current ? pathRef.current.getTotalLength() : "0"}
-          strokeDashoffset={pathRef.current ? pathRef.current.getTotalLength() - progress : "0"}
-          style={{ transition: "stroke-dashoffset 0.1s linear" }}
-        />
-        {/* Glowing dot */}
-        <circle
-          ref={dotRef}
-          r="8"
-          fill="#007BFF"
-          filter="url(#glow)"
-        />
-        {/* Enhanced glow filter */}
-        <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-            <feFlood floodColor="#007BFF" floodOpacity="0.3" result="glowColor"/>
-            <feComposite in="glowColor" in2="coloredBlur" operator="in" result="softGlow"/>
-            <feMerge>
-              <feMergeNode in="softGlow"/>
-              <feMergeNode in="softGlow"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-      </svg>
+    <div
+      ref={processRef}
+      className="relative bg-[#EFF0F5] px-4 md:px-6 py-16 md:py-20 text-[#4B4F65] font-[Inter] min-h-[600px] overflow-hidden"
+    >
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-[#2B2B3A] mb-4">Our Process</h2>
+        <p className="text-lg max-w-2xl mx-auto">
+          We follow a structured approach to deliver exceptional results for every project
+        </p>
+      </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto">
-        {steps.map((step, index) => (
-          <div key={index}>
-            {/* Icon on Line */}
-            <div
-              className={`absolute z-10 w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center text-[#4B4F65] transition-all duration-500 ${
-                activeSteps.has(index) ? 'scale-100 opacity-100' : 'scale-90 opacity-50'
-              }`}
-              style={isMobile ? {
-                top: step.mobilePosition.top,
-                left: step.mobilePosition.iconLeft,
-              } : {
-                top: step.desktopPosition.iconTop,
-                left: step.desktopPosition.left,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              {React.createElement(step.icon, { 
-                className: `w-10 h-10 transition-colors duration-500 ${
-                  activeSteps.has(index) ? 'text-[#007BFF]' : 'text-gray-400'
-                }` 
-              })}
-            </div>
+      {/* Desktop & Tablet View */}
+      <div className={`hidden md:block max-w-6xl mx-auto relative ${isVisible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-700`}>
+        {/* Connection Line */}
+        <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 rounded-full">
+          <div 
+            className="h-full bg-blue-500 rounded-full transition-all duration-700 ease-out"
+            style={{ 
+              width: `${((activeStep + 1) / steps.length) * 100}%`,
+              boxShadow: '0 0 10px rgba(0, 123, 255, 0.5)'
+            }}
+          ></div>
+        </div>
 
-            {/* Text Content */}
+        {/* Process Steps */}
+        <div className="flex justify-between relative">
+          {steps.map((step, index) => (
             <div
-              className={`absolute transition-all duration-500 ${
-                activeSteps.has(index)
-                  ? 'opacity-100 transform translate-y-0' 
-                  : 'opacity-0 transform -translate-y-4'
+              key={index}
+              ref={el => stepRefs.current[index] = el}
+              className={`relative flex flex-col items-center w-1/4 transition-all duration-500 ${
+                index > activeStep ? 'opacity-40' : 'opacity-100'
               }`}
-              style={isMobile ? {
-                ...step.mobilePosition.contentPosition,
-              } : {
-                top: step.desktopPosition.contentTop,
-                left: step.desktopPosition.left,
-                transform: 'translateX(-50%)',
-                width: '300px',
-                textAlign: 'center',
-              }}
+              onMouseEnter={() => setIsHovering(index)}
+              onMouseLeave={() => setIsHovering(null)}
+              onClick={() => handleStepClick(index)}
             >
-              <div className="px-4">
+              {/* Step Number */}
+              <div className="absolute top-0 -left-2 text-xs font-bold bg-blue-100 text-blue-600 rounded-full w-5 h-5 flex items-center justify-center">
+                {index + 1}
+              </div>
+
+              {/* Step Icon */}
+              <div
+                className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center z-10 cursor-pointer transition-all duration-500 ${
+                  index <= activeStep
+                    ? 'bg-white shadow-lg transform scale-100'
+                    : 'bg-gray-100 transform scale-90'
+                } ${isHovering === index ? 'transform scale-110' : ''}`}
+                style={{
+                  backgroundColor: index <= activeStep ? step.iconBg : '#E2E8F0',
+                  boxShadow: index <= activeStep ? '0 10px 25px rgba(0, 137, 255, 0.15)' : 'none',
+                }}
+              >
+                {React.createElement(step.icon, {
+                  className: `w-8 h-8 md:w-10 md:h-10 transition-colors duration-500 ${
+                    index <= activeStep ? 'text-blue-500' : 'text-gray-400'
+                  }`,
+                })}
+              </div>
+
+              {/* Step Content */}
+              <div
+                className={`mt-6 px-2 md:px-4 pt-4 pb-6 bg-white rounded-lg shadow-md transition-all duration-500 max-w-xs mx-auto ${
+                  index <= activeStep
+                    ? 'opacity-100 transform translate-y-0'
+                    : 'opacity-0 transform translate-y-4'
+                } ${
+                  isHovering === index ? 'transform scale-105 shadow-lg z-20' : ''
+                }`}
+                style={{
+                  transitionDelay: `${index * 100}ms`,
+                  borderLeft: index <= activeStep ? '3px solid #0089FF' : 'none',
+                }}
+              >
                 <h3 className="text-lg font-semibold text-[#2B2B3A] mb-2">
                   {step.title}
                 </h3>
-                <p className="text-sm mb-1">{step.description}</p>
+                <p className="text-sm mb-1 text-[#4B4F65]">{step.description}</p>
                 {step.sub && (
-                  <p className="text-sm font-semibold text-[#2B2B3A] mt-1">
+                  <p className="text-sm font-medium text-blue-600 mt-2">
                     {step.sub}
                   </p>
                 )}
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile View */}
+      <div className={`md:hidden ${isVisible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-700`}>
+        <div className="relative">
+          {/* Vertical Connection Line */}
+          <div className="absolute left-6 top-0 bottom-0 w-1 bg-gray-200 rounded-full">
+            <div 
+              className="w-full bg-blue-500 rounded-full transition-all duration-700 ease-out"
+              style={{ 
+                height: `${((activeStep + 1) / steps.length) * 100}%`,
+                boxShadow: '0 0 10px rgba(0, 123, 255, 0.5)'
+              }}
+            ></div>
           </div>
+
+          {/* Process Steps */}
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              ref={el => stepRefs.current[index] = el}
+              className={`relative flex mb-12 transition-all duration-500 ${
+                index > activeStep ? 'opacity-40' : 'opacity-100'
+              }`}
+              onClick={() => handleStepClick(index)}
+            >
+              {/* Step Icon */}
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center z-10 cursor-pointer transition-all duration-500 mr-5 ${
+                  index <= activeStep
+                    ? 'bg-white shadow-lg transform scale-100'
+                    : 'bg-gray-100 transform scale-90'
+                }`}
+                style={{
+                  backgroundColor: index <= activeStep ? step.iconBg : '#E2E8F0',
+                  boxShadow: index <= activeStep ? '0 10px 25px rgba(0, 137, 255, 0.15)' : 'none',
+                }}
+              >
+                {React.createElement(step.icon, {
+                  className: `w-6 h-6 transition-colors duration-500 ${
+                    index <= activeStep ? 'text-blue-500' : 'text-gray-400'
+                  }`,
+                })}
+              </div>
+
+              {/* Step Content */}
+              <div
+                className={`flex-1 transition-all duration-500 ${
+                  index <= activeStep
+                    ? 'opacity-100 transform translate-y-0'
+                    : 'opacity-0 transform translate-y-4'
+                }`}
+                style={{
+                  transitionDelay: `${index * 100}ms`,
+                }}
+              >
+                <h3 className="text-lg font-semibold text-[#2B2B3A] mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-sm mb-1 text-[#4B4F65]">{step.description}</p>
+                {step.sub && (
+                  <p className="text-sm font-medium text-blue-600 mt-2">
+                    {step.sub}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Progress Indicators / Navigation */}
+      <div className="flex justify-center mt-10 space-x-2">
+        {steps.map((_, index) => (
+          <button
+            key={index}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index <= activeStep ? 'bg-blue-500 w-6' : 'bg-gray-300'
+            }`}
+            onClick={() => handleStepClick(index)}
+            aria-label={`Go to step ${index + 1}`}
+          ></button>
         ))}
       </div>
     </div>

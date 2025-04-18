@@ -16,7 +16,7 @@ export default function HomePage() {
     <WhoAreWe/>
     <OurValues/>
     <Process/>
-    <Testimonial/>
+    
     <Footer/>
     </>
   )
